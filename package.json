@@ -1,0 +1,46 @@
+{
+  "name": "webauthn",
+  "version": "0.1.0",
+  "description": "WenAuthn",
+  "author": "RubaXa <ibn@rubaxa.org>",
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --coverage",
+    "ts-build": "tsc",
+    "git-clean": "git clean -f",
+    "prepublish": "npm run test && npm run ts-build",
+    "postpublish": "npm run git-clean"
+  },
+  "files": [
+    "*.js",
+    "*.d.ts",
+    "src/*.js",
+    "src/*.d.ts"
+  ],
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "@types/webappsec-credential-management": ">=0.4.1"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "testRegex": "\\.tests\\.ts$",
+    "transformIgnorePatterns": [],
+    "setupFilesAfterEnv": [
+      "<rootDir>/__jest__/extensions.ts"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json"
+    ]
+  }
+}
