@@ -29,7 +29,7 @@ const credentialCreateRequest = createMultiPhaseRequest<{login: params}>()
 	.phase(
 		({extra, credential, options}) => fetchJSON('/api/v1/webauthn/credentials/create/confirm', {
 			...extra,
-			response: encodeAttestationResponsePayload(credential),
+			attestation: encodeAttestationResponsePayload(credential),
 		}).then(res => ({
 			extra: res.body,
 			options,
@@ -75,7 +75,7 @@ const credentialRequest = createMultiPhaseRequest<{login: params}>()
 	.phase(
 		({extra, credential, options}) => fetchJSON('/api/v1/webauthn/credentials/get/confirm', {
 			...extra,
-			response: encodeAssertionResponsePlayload(credential),
+			assertion: encodeAssertionResponsePlayload(credential),
 		}).then(res => ({
 			extra: res.body,
 			options,
