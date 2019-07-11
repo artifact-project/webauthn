@@ -21,7 +21,7 @@ const credentialCreateRequest = createMultiPhaseRequest<{login: params}>()
 		.then(res => res.body)
 		.then(parseAsCredentialCreationOptionsAndExtra)
 	)
-	.phase(({options, extra}) => navigate.navigator.create(options).then(credential => ({
+	.phase(({options, extra}) => navigation.credentials.create(options).then(credential => ({
 		extra,
 		options,
 		credential,
@@ -67,7 +67,7 @@ const credentialRequest = createMultiPhaseRequest<{login: params}>()
 		.then(res => res.body)
 		.then(parseAsCredentialRequestOptionsAndExtra)
 	)
-	.phase(({options, extra}) => navigate.navigator.get(options).then(credential => ({
+	.phase(({options, extra}) => navigation.credentials.get(options).then(credential => ({
 		extra,
 		options,
 		credential,
