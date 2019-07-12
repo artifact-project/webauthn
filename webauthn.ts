@@ -18,7 +18,6 @@ export type EncodedPublicKeyCredential = Encode<PublicKeyCredential>
 export type EncodePublicKeyCredentialUserEntity = Encode<PublicKeyCredentialUserEntity>
 export type EncodePublicKeyCredentialDescriptor = Encode<PublicKeyCredentialDescriptor>
 
-
 type PhaseRequest<P, R> = (params: P) => Promise<R> | R;
 type PhaseRequestReturnType<T> = T extends PhaseRequest<any, infer R> ? R : never
 
@@ -27,7 +26,20 @@ type MultiPhaseRequest<
 	PR extends PhaseRequest<any, any>,
 > = ((params: P) => Promise<PhaseRequestReturnType<PR>>) & {
 	phase: <T extends PhaseRequest<PhaseRequestReturnType<PR>, any>>(request: T) => MultiPhaseRequest<P, T>;
-};
+}
+
+const nav = typeof navigator !== 'undefined' ? navigator : null;
+const credentials = nav && nav.credentials || null;
+const supported = !!(
+	typeof (window as any).PublicKeyCredential === 'function'
+	&& credentials
+	&& credentials.create
+	&& credentials.get
+);
+
+export function isWebauthnSupported() {
+	return supported;
+}
 
 function createPhaseRequest<
 	P extends object,
