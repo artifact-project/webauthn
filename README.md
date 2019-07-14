@@ -10,6 +10,7 @@ A set of tools for building an API and interacts with [WebAuthn](https://webauth
 
 ```ts
 import {
+	credentials,
 	createMultiPhaseRequest,
 	fetchJSON,
 	parseAsCredentialCreationOptionsAndExtra,
@@ -21,7 +22,7 @@ const credentialCreateRequest = createMultiPhaseRequest<{login: params}>()
 		.then(res => res.body)
 		.then(parseAsCredentialCreationOptionsAndExtra)
 	)
-	.phase(({options, extra}) => navigator.credentials.create(options).then(credential => ({
+	.phase(({options, extra}) => credentials.create(options).then(credential => ({
 		extra,
 		options,
 		credential,
@@ -56,6 +57,7 @@ credentialCreateRequest({
 
 ```ts
 import {
+	credentials,
 	createMultiPhaseRequest,
 	fetchJSON,
 	parseAsCredentialRequestOptionsAndExtra,
@@ -67,7 +69,7 @@ const credentialRequest = createMultiPhaseRequest<{login: params}>()
 		.then(res => res.body)
 		.then(parseAsCredentialRequestOptionsAndExtra)
 	)
-	.phase(({options, extra}) => navigator.credentials.get(options).then(credential => ({
+	.phase(({options, extra}) => credentials.get(options).then(credential => ({
 		extra,
 		options,
 		credential,
@@ -98,6 +100,12 @@ credentialRequest({
 
 ### API
 
+- **isWebauthnSupported**(): `boolean`
+- <u>credentials</u>
+  - **hasKeys**(): `'probably' | 'maybe' | ''`
+  - **revokeKeys**(): `void`
+  - **create**(options?: `CredentialCreationOptions`): `Promise<CredentialType|null>`
+  - **get**(options?: `CredentialRequestOptions`): `Promise<CredentialType|null>`
 - **createPhaseRequest**`<P extends object>`(): `(params: P) => Promise<R>`
 - **fetchJSON**(url: `string`, params: `object`): `Response`
 - <u>Decode</u>

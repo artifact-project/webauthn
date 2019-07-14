@@ -29,16 +29,60 @@ type MultiPhaseRequest<
 }
 
 const nav = typeof navigator !== 'undefined' ? navigator : null;
-const credentials = nav && nav.credentials || null;
-const supported = !!(
+const nativeCredentials = nav && nav.credentials || null;
+const nativeSupported = !!(
 	typeof (window as any).PublicKeyCredential === 'function'
-	&& credentials
-	&& credentials.create
-	&& credentials.get
+	&& nativeCredentials
+	&& nativeCredentials.create
+	&& nativeCredentials.get
 );
 
+function store(key: string, val?: string | null): string | null {
+	try {
+		const keyPath = `@artifact-project/webauthn/${key}`;
+
+		if (val === null) {
+			localStorage.removeItem(keyPath);
+		} else if (val !== undefined) {
+			localStorage.setItem(keyPath, val)
+		} else {
+			val = localStorage.getItem(keyPath);
+		}
+	} catch (_) {}
+
+	return val;
+}
+
+export const credentials = {
+	hasKeys(): 'probably' | 'maybe' | '' {
+		return (
+			store('hasKeys') === 'Y'
+				? 'probably'
+				: (nativeSupported ? 'maybe' : '')
+		);
+	},
+
+	revokeKeys() {
+		store('hasKeys', null);
+	},
+
+	create(options?: CredentialCreationOptions): Promise<CredentialType|null> {
+		return nativeCredentials.create(options).then(credential => {
+			if (credential) {
+				store('hasKeys', 'Y');
+			}
+
+			return credential;
+		});
+	},
+
+	get(options?: CredentialRequestOptions): Promise<CredentialType|null> {
+		return nativeCredentials.get(options);
+	},
+};
+
 export function isWebauthnSupported() {
-	return supported;
+	return nativeSupported;
 }
 
 function createPhaseRequest<
