@@ -116,6 +116,8 @@ function fetchParseJSON(response: Response) {
 export function fetchJSON<T extends object>(url: string, params: object): Promise<T> {
 	return fetch(url, {
 		method: 'POST',
+		mode: 'cors',
+		credentials: 'include',
 		body: Object.entries(params).reduce((form, [key, value]) => {
 			form.append(key, typeof value === 'object' ? JSON.stringify(value) : value);
 			return form;
