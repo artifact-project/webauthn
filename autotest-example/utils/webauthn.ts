@@ -14,7 +14,7 @@ const AAGUID: Buffer = crypto.randomBytes(16);
 type CollectedClientDataType = string;
 
 // используется для мока navigator.credentials.create (только возвращаемый attestation) и для добавления ключа по апи
-export async function CreateAttestationForCredentialsCreateConfirm(
+export function CreateAttestationForCredentialsCreateConfirm(
 	options: CredentialsCreateResponseOptions
 ) {
 	const user = {
@@ -37,12 +37,12 @@ export async function CreateAttestationForCredentialsCreateConfirm(
 		}
 	);
 
-	const CollectedClientData: CollectedClientDataType = await CreateCollectedClientData(
+	const CollectedClientData: CollectedClientDataType = CreateCollectedClientData(
 		challenge,
 		'https://webauthn.me',
 		'webauthn.create'
 	);
-	const CollectedClientDataHash: Buffer = await GetHashOfCollectedClientData(CollectedClientData);
+	const CollectedClientDataHash: Buffer = GetHashOfCollectedClientData(CollectedClientData);
 
 	// используется только, чтобы сохранить взаимосвязь аккаунт <-> аутентификатор, но если аутентификатор одноразовый
 	// для автотеста, то можно не сохранять
@@ -50,10 +50,10 @@ export async function CreateAttestationForCredentialsCreateConfirm(
 
 	const credentialId: Buffer = crypto.randomBytes(16);
 
-	const attestedCredentialData: Buffer = await CreateAttestedCredentialData(credentialId, publicKey);
-	const authData: Buffer = await CreateAuthenticatorData(attestedCredentialData, counter);
+	const attestedCredentialData: Buffer = CreateAttestedCredentialData(credentialId, publicKey);
+	const authData: Buffer = CreateAuthenticatorData(attestedCredentialData, counter);
 	counter++; // увеличиваем счётчик при каждом "обращении" к аутентификатору
-	const AttestationObject: Buffer = await GeneratingAnAttestationObject(authData, CollectedClientDataHash, privateKey);
+	const AttestationObject: Buffer = GeneratingAnAttestationObject(authData, CollectedClientDataHash, privateKey);
 
 	const attestation: AttestationForCredentialsCreateConfirm = {
 		id: credentialId.toString('base64'),
@@ -71,24 +71,24 @@ export async function CreateAttestationForCredentialsCreateConfirm(
 	};
 }
 
-export async function CreateAssertionForCredentialsGetConfirm(
+export function CreateAssertionForCredentialsGetConfirm(
 	publicKeyOptions: GottenCredentials,
 	privateKey: string,
 	credentialIdString: string
-): Promise<AssertionForCredentialsGetConfirm> {
+): AssertionForCredentialsGetConfirm {
 	const challenge = Buffer.from(publicKeyOptions.challenge as string, 'base64' as BufferEncoding);
-	const authData: Buffer = await CreateAuthenticatorData(null, counter);
+	const authData: Buffer = CreateAuthenticatorData(null, counter);
 
 	counter++; // увеличиваем счётчик при каждом "обращении" к аутентификатору
 
-	const CollectedClientData: CollectedClientDataType = await CreateCollectedClientData(
+	const CollectedClientData: CollectedClientDataType = CreateCollectedClientData(
 		challenge,
 		'https://webauthn.me',
 		'webauthn.get'
 	);
-	const CollectedClientDataHash: Buffer = await GetHashOfCollectedClientData(CollectedClientData);
+	const CollectedClientDataHash: Buffer = GetHashOfCollectedClientData(CollectedClientData);
 
-	const assertionSignature: Buffer = await GenerateAnAssertionSignature(authData, CollectedClientDataHash, privateKey);
+	const assertionSignature: Buffer = GenerateAnAssertionSignature(authData, CollectedClientDataHash, privateKey);
 
 	return {
 		type: 'public-key',
@@ -111,11 +111,11 @@ function urlSafeBase64Encode(buffer: Buffer): string {
 
 // https://www.w3.org/TR/webauthn-1/#sec-client-data
 // tslint:disable-next-line:max-line-length
-async function CreateCollectedClientData(
+function CreateCollectedClientData(
 	challenge: Buffer,
 	origin: string,
 	type: 'webauthn.create' | 'webauthn.get'
-): Promise<CollectedClientDataType> {
+): CollectedClientDataType {
 	return JSON.stringify({
 		type,
 		challenge: urlSafeBase64Encode(challenge),
@@ -123,25 +123,25 @@ async function CreateCollectedClientData(
 	});
 }
 
-async function GetHashOfCollectedClientData(clientData: CollectedClientDataType): Promise<Buffer> {
+function GetHashOfCollectedClientData(clientData: CollectedClientDataType): Buffer {
 	// This is the hash (computed using SHA-256) of the JSON-serialized client data, as constructed by the client.
 	return crypto.createHash('sha256').update(clientData, 'utf8').digest();
 }
 
-async function GenerateAnAssertionSignature(
+function GenerateAnAssertionSignature(
 	authData: Buffer,
 	clientDataHash: Buffer,
 	privateKey: string
-): Promise<Buffer> {
+): Buffer {
 	return crypto.createSign('SHA256')
 		.update(Buffer.concat([authData, clientDataHash]))
 		.sign(privateKey);
 }
 
-async function CreateAttestedCredentialData(
+function CreateAttestedCredentialData(
 	credentialId: Buffer,
 	publicKey: Buffer
-): Promise<Buffer> {
+): Buffer {
 	const credentialIdLength = Buffer.alloc(2);
 	credentialIdLength.writeUInt16BE(credentialId.byteLength, 0);
 
@@ -162,10 +162,10 @@ async function CreateAttestedCredentialData(
 }
 
 // https://www.w3.org/TR/webauthn-1/#sec-authenticator-data
-async function CreateAuthenticatorData(
+function CreateAuthenticatorData(
 	attestedCredentialData: Buffer | null, counter: number = 0
-): Promise<Buffer> {
-	const rpIdHash = crypto.createHash('sha256').update('mail.ru', 'utf8').digest();
+): Buffer {
+	const rpIdHash = crypto.createHash('sha256').update('webauthn.me', 'utf8').digest();
 
 	const flags = new Uint8Array(1);
 	if (attestedCredentialData) {
@@ -183,11 +183,11 @@ async function CreateAuthenticatorData(
 }
 
 // https://www.w3.org/TR/webauthn-1/#generating-an-attestation-object
-async function GeneratingAnAttestationObject(
+function GeneratingAnAttestationObject(
 	authData: Buffer,
 	hash: Buffer,
 	privateKey: string
-): Promise<Buffer> {
+): Buffer {
 	const concated = Buffer.concat([authData, hash]);
 
 	const sign = crypto.createSign('sha256');

@@ -1,12 +1,11 @@
 import 'mocha';
 import '@wdio/sync';
 import {CreateAttestationForCredentialsCreateConfirm} from '../../utils/webauthn';
+import WebAuthnMocks from '../../utils/mocks';
 
 describe('WebAuthn', function () {
 	it('should work', function () {
 		browser.url('/');
-
-		console.log(CreateAttestationForCredentialsCreateConfirm)
 
 		browser.$('.tutorial-container').waitForDisplayed();
 		browser.execute(function () {
@@ -18,9 +17,20 @@ describe('WebAuthn', function () {
 		nameInput.scrollIntoView();
 		nameInput.setValue('test@mail.ru');
 
+		WebAuthnMocks.CredentialsCreateMock();
+		WebAuthnMocks.CredentialsGetMock();
+
 		const step1Button = browser.$('.tutorial-step-1-register');
 		step1Button.scrollIntoView();
 		step1Button.click();
+
+		browser.waitUntil(function () {
+			return browser.execute(function () {
+				return !!window.credentialsCreateArgs;
+			});
+		});
+
+		const privateKey = WebAuthnMocks.ReplaceCredentialsCreateResponse(true);
 
 		browser.waitUntil(function () {
 			return browser.execute(function () {
@@ -42,9 +52,19 @@ describe('WebAuthn', function () {
 		step4Button.scrollIntoView();
 		step4Button.click();
 
+		browser.waitUntil(function () {
+			return browser.execute(function () {
+				return !!window.credentialsGetArgs;
+			});
+		});
+
+		WebAuthnMocks.replaceCredentialsGetResponse(true, privateKey);
+
 		const success = browser.$('.tutorial-step-6-container.active');
 		success.waitForExist();
 		success.scrollIntoView();
 		success.click();
+
+		browser.pause(2500);
 	});
 });
