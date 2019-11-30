@@ -1,5 +1,5 @@
-@artifact-project/webauthn
---------------------------
+@artifact-project/webauthn 🔐
+-----------------------------
 A set of tools for building an API and interacts with [WebAuthn](https://webauthn.me/).
 
 ```sh
