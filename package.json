@@ -12,23 +12,26 @@
   "main": "webauthn.js",
   "scripts": {
     "test": "jest --coverage",
+    "start": "npm test -- --watchAll",
     "ts-build": "tsc",
-    "git-clean": "git clean -f",
-    "prepublish": "npm run test && npm run ts-build",
-    "postpublish": "npm run git-clean"
+    "ts-build-clean": "rimraf ./*.{d.ts,js,js.map} && rimraf ./src/**/*.{d.ts,js,js.map}",
+    "dts-build": "dts-bundle-generator -o webauthn.d.ts webauthn.ts",
+    "prepublish": "npm run test && npm run ts-build && npm run dts-build",
+    "postpublish": "npm run ts-build-clean"
   },
-  "files": [
-    "*.js",
-    "*.d.ts"
-  ],
   "devDependencies": {
-    "@types/jest": "^24.0.15",
-    "jest": "^24.8.0",
-    "ts-jest": "^24.0.2",
-    "typescript": "^3.5.3"
+    "@types/jest": "^24.0.23",
+    "@types/node": "^12.12.14",
+    "dts-bundle-generator": "^3.3.1",
+    "jest": "^24.9.0",
+    "rimraf": "^3.0.0",
+    "rollup": "^1.27.5",
+    "rollup-plugin-typescript2": "^0.25.2",
+    "ts-jest": "^24.2.0",
+    "typescript": "^3.7.2"
   },
   "dependencies": {
-    "@types/webappsec-credential-management": ">=0.4.1"
+    "@types/webappsec-credential-management": "^0.5.1"
   },
   "jest": {
     "transform": {

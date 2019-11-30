@@ -2,6 +2,46 @@
 --------------------------
 A set of tools for building an API and interacts with [WebAuthn](https://webauthn.me/).
 
+```sh
+npm i --save @artifact-project/webauthn
+```
+
+---
+
+### Features
+
+- Easy and Flexibility API 🧬
+- Supported IFrames (regardless of nesting) 💪🏻
+
+---
+
+### Using in iframe
+
+##### In parent window
+```ts
+import { allowFrom } '@artifact-project/webauthn/allow';
+allowFrom(['mail.ru', '{o2,account}.mail.ru']);
+```
+
+##### Or embed the code in the parent window
+```html
+<html>
+	<head>
+		<script>
+			/* Replace this comment on the code from this file: './allow.js' */
+			webauthn.allowFrom(['mail.ru', '{o2,account}.mail.ru']);
+		</script>
+	</head>
+	<body>...</body>
+</html>
+```
+
+##### Inside iframe
+```ts
+import { allowFor } '@artifact-project/webauthn';
+allowFor(['mail.ru', '*.mail.ru']);
+```
+
 ---
 
 ### Credential Create Request (aka Registration)

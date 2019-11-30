@@ -8,13 +8,11 @@ import {
 	parseAsCredentialCreationOptionsAndExtra,
 	parseAsCredentialRequestOptionsAndExtra,
 
-	EncodedCredentialCreationOptions,
-	EncodedCredentialRequestOptions,
-
 	createMultiPhaseRequest,
-} from './webauthn';
+	Encode,
+} from './utils';
 
-const credentialCreationRaw: EncodedCredentialCreationOptions = {
+const credentialCreationRaw: Encode<CredentialCreationOptions> = {
 	publicKey: {
 		rp: {
 			name: 'Mail.ru Group'
@@ -33,7 +31,7 @@ const credentialCreationRaw: EncodedCredentialCreationOptions = {
 		attestation: 'none',
 	}
 };
-const credentialRequestOptionsRaw: EncodedCredentialRequestOptions = {
+const credentialRequestOptionsRaw: Encode<CredentialRequestOptions> = {
 	publicKey: {
 		challenge: 'l1PBtg9F2PPwC0h3O4x1DO+RC0p8bCljyxbyecWoqSU=',
 		timeout: 30000,
@@ -52,8 +50,16 @@ describe('buffer', () => {
 		expect(decodeBuffer(strBuf)).toEqual(buf);
 	});
 
+	it('decode undefined', () => {
+		expect(decodeBuffer(undefined as any)).toEqual(new Uint8Array);
+	});
+
 	it('encode', () => {
 		expect(encodeBuffer(buf)).toEqual(strBuf);
+	});
+
+	it('encode undefined', () => {
+		expect(encodeBuffer(undefined as any)).toEqual('');
 	});
 });
 
@@ -62,18 +68,18 @@ describe('credentials', () => {
 		const raw = credentialCreationRaw;
 		const options = decodeCredentialCreationOptions(raw);
 
-		expect(options.publicKey.user.id).toEqual(decodeBuffer(raw.publicKey.user.id));
-		expect(options.publicKey.challenge).toEqual(decodeBuffer(raw.publicKey.challenge));
-		expect(options.publicKey.timeout).toEqual(raw.publicKey.timeout);
+		expect(options.publicKey!.user.id).toEqual(decodeBuffer(raw.publicKey!.user.id));
+		expect(options.publicKey!.challenge).toEqual(decodeBuffer(raw.publicKey!.challenge));
+		expect(options.publicKey!.timeout).toEqual(raw.publicKey!.timeout);
 	});
 
 	it('decodeCredentialRequestOptions', () => {
 		const raw = credentialRequestOptionsRaw;
 		const options = decodeCredentialRequestOptions(raw);
 
-		expect(options.publicKey.challenge).toEqual(decodeBuffer(raw.publicKey.challenge));
-		expect(options.publicKey.timeout).toEqual(raw.publicKey.timeout);
-		expect(options.publicKey.allowCredentials[0].id).toEqual(decodeBuffer(raw.publicKey.allowCredentials[0].id));
+		expect(options.publicKey!.challenge).toEqual(decodeBuffer(raw.publicKey!.challenge));
+		expect(options.publicKey!.timeout).toEqual(raw.publicKey!.timeout);
+		expect(options.publicKey!.allowCredentials![0].id).toEqual(decodeBuffer(raw.publicKey!.allowCredentials![0].id));
 	});
 });
 
@@ -95,7 +101,7 @@ describe('parse', () => {
 		});
 
 		expect(data.extra.session).toBe('123');
-		expect(!!data.options.publicKey.user.id.byteLength).toBe(true);
+		expect(!!data.options.publicKey!.user.id.byteLength).toBe(true);
 	});
 
 	it('parseAsCredentialRequestOptionsAndExtra', () => {
@@ -105,6 +111,6 @@ describe('parse', () => {
 		});
 
 		expect(data.extra.session).toBe('321');
-		expect(!!data.options.publicKey.allowCredentials[0].id.byteLength).toBe(true);
+		expect(!!data.options.publicKey!.allowCredentials![0].id.byteLength).toBe(true);
 	});
 });
