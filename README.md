@@ -27,13 +27,13 @@ allowFrom(['mail.ru', '{o2,account}.mail.ru']);
 ##### Or embed the code in the parent window
 ```html
 <html>
-	<head>
-		<script>
-			/* Replace this comment on the code from this file: './node_modules/@artifact-project/webauthn/allow.js' */
-			webauthn.allowFrom(['mail.ru', '{o2,account}.mail.ru']);
-		</script>
-	</head>
-	<body>...</body>
+  <head>
+    <script>
+      /* Replace this comment on the code from this file: './node_modules/@artifact-project/webauthn/allow.js' */
+      webauthn.allowFrom(['mail.ru', '{o2,account}.mail.ru']);
+    </script>
+  </head>
+  <body>...</body>
 </html>
 ```
 
