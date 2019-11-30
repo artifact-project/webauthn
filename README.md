@@ -20,7 +20,7 @@ npm i --save @artifact-project/webauthn
 
 ##### In parent window
 ```ts
-import { allowFrom } '@artifact-project/webauthn/allow';
+import { allowFrom } from '@artifact-project/webauthn/allow';
 allowFrom(['mail.ru', '{o2,account}.mail.ru']);
 ```
 
@@ -39,7 +39,7 @@ allowFrom(['mail.ru', '{o2,account}.mail.ru']);
 
 ##### Inside iframe
 ```ts
-import { allowFor } '@artifact-project/webauthn';
+import { allowFor } from '@artifact-project/webauthn';
 allowFor(['mail.ru', '*.mail.ru']);
 ```
 
