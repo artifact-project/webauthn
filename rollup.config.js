@@ -1,9 +1,9 @@
 import typescript from 'rollup-plugin-typescript2';
 import replace from 'rollup-plugin-replace';
-import uglify from 'rollup-plugin-uglify';
+import { uglify } from 'rollup-plugin-uglify';
 import ts from 'typescript';
 
-export default ['allow', 'webauthn'].map(name => [
+export default ['allow', 'webauthn'].flatMap(name => [
 	config(name, true),
 	config(name, false),
 ]);

@@ -1,5 +1,12 @@
 import { log, verbose } from './logger';
-import { globalThis, isTrustedOrigin, convertOriginPatterns, REQUEST_PID_KEY, RESPONSE_PID_KEY } from './allow';
+import {
+	globalThis,
+	isTrustedOrigin,
+	convertOriginPatterns,
+
+	REQUEST_PID_KEY,
+	RESPONSE_PID_KEY,
+} from './allow';
 
 let cid = 0;
 
@@ -7,7 +14,7 @@ export function isCredentialsSupported() {
 	const nav = globalThis.navigator || null;
 	const nativeCredentials = nav && nav.credentials || null;
 	return !!(
-		typeof globalThis.PublicKeyCredential === 'function'
+		typeof globalThis['PublicKeyCredential'] === 'function'
 		&& nativeCredentials
 		&& nativeCredentials.create
 		&& nativeCredentials.get

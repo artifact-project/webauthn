@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "es2015",
     "target": "es5",
     "declaration": true,
     "esModuleInterop": true,
@@ -11,6 +11,8 @@
   },
   "exclude": [
     "dist",
-    "node_modules"
+    "node_modules",
+    "autotest-example",
+    "__jest__"
   ]
 }

@@ -12,6 +12,7 @@ npm i --save @artifact-project/webauthn
 
 - Easy and Flexibility API 🧬
 - Supported IFrames (regardless of nesting) 💪🏻
+- Fully testelably ✅
 
 ---
 
@@ -28,7 +29,7 @@ allowFrom(['mail.ru', '{o2,account}.mail.ru']);
 <html>
 	<head>
 		<script>
-			/* Replace this comment on the code from this file: './allow.js' */
+			/* Replace this comment on the code from this file: './node_modules/@artifact-project/webauthn/allow.js' */
 			webauthn.allowFrom(['mail.ru', '{o2,account}.mail.ru']);
 		</script>
 	</head>

@@ -24,12 +24,10 @@ export function allowFrom(originPatterns: string[]): RevokeAllow {
 	const origins = convertOriginPatterns(originPatterns);
 
 	function handleMessage({data, origin, source}: MessageEvent) {
-		function send(extra: object) {
-			const packed = {
-				[RESPONSE_PID_KEY]: data[REQUEST_PID_KEY],
-				...extra,
-			};
+		function send(packed: object) {
 			const logMsg = `credentials.${data.method}(...) send response`;
+
+			packed[RESPONSE_PID_KEY] = data[REQUEST_PID_KEY];
 
 			try {
 				verbose(logMsg, {packed, origin});
@@ -66,10 +64,10 @@ export function allowFrom(originPatterns: string[]): RevokeAllow {
 	}
 
 	log('allow from', {origins: originPatterns});
-	window.addEventListener('message', handleMessage);
+	globalThis.addEventListener('message', handleMessage);
 	return () => {
 		log('revoke allow from', {origins: originPatterns});
-		window.removeEventListener('message', handleMessage);
+		globalThis.removeEventListener('message', handleMessage);
 	};
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "@artifact-project/webauthn",
-  "version": "0.2.1",
+  "version": "1.0.0-rc.1",
   "description": "WebAuthn — A set of tools for building an API and interacts with",
   "keywords": [
     "webauthn",
@@ -13,11 +13,14 @@
   "scripts": {
     "test": "jest --coverage",
     "start": "npm test -- --watchAll",
-    "ts-build": "tsc",
-    "ts-build-clean": "rimraf ./*.{d.ts,js,js.map} && rimraf ./src/**/*.{d.ts,js,js.map}",
+    "build": "rollup --config && npm run dts-build",
+    "build-clean": "npm run ts-build-clean",
+    "git-clean": "git cliean -fd",
     "dts-build": "dts-bundle-generator -o webauthn.d.ts webauthn.ts",
-    "prepublish": "npm run test && npm run ts-build && npm run dts-build",
-    "postpublish": "npm run ts-build-clean"
+    "dts-build-webauthn": "npm run dts-build-webauthn && npm run dts-build-allow",
+    "dts-build-allow": "dts-bundle-generator -o allow.d.ts allow.ts",
+    "prepublishOnly": "npm run test && npm run build",
+    "postpublish": "echo 'npm run git-clean?\n';"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",
@@ -26,9 +29,12 @@
     "jest": "^24.9.0",
     "rimraf": "^3.0.0",
     "rollup": "^1.27.5",
+    "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-typescript2": "^0.25.2",
+    "rollup-plugin-uglify": "^6.0.3",
     "ts-jest": "^24.2.0",
-    "typescript": "^3.7.2"
+    "typescript": "^3.7.2",
+    "uglify-js": "^3.7.1"
   },
   "dependencies": {
     "@types/webappsec-credential-management": "^0.5.1"
