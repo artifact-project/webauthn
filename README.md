@@ -29,7 +29,7 @@ allowFrom(['mail.ru', '{o2,account}.mail.ru']);
 <html>
   <head>
     <script>
-      /* Replace this comment on the code from this file: './node_modules/@artifact-project/webauthn/allow.js' */
+      /* Replace this comment on the code from this file: ./node_modules/@artifact-project/webauthn/allow.js */
       webauthn.allowFrom(['mail.ru', '{o2,account}.mail.ru']);
     </script>
   </head>
@@ -141,12 +141,10 @@ credentialRequest({
 
 ### API
 
-- **isWebauthnSupported**(): `boolean`
+- **isCredentialsSupported**(): `boolean`
 - <u>credentials</u>
-  - **hasKeys**(): `'probably' | 'maybe' | ''`
-  - **revokeKeys**(): `void`
-  - **create**(options?: `CredentialCreationOptions`): `Promise<CredentialType|null>`
-  - **get**(options?: `CredentialRequestOptions`): `Promise<CredentialType|null>`
+  - **create**(options?: `CredentialCreationOptions`): `Promise<CredentialType | null>`
+  - **get**(options?: `CredentialRequestOptions`): `Promise<CredentialType | null>`
 - **createPhaseRequest**`<P extends object>`(): `(params: P) => Promise<R>`
 - **fetchJSON**(url: `string`, params: `object`): `Response`
 - <u>Decode</u>
