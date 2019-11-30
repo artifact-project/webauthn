@@ -10,6 +10,11 @@
   "author": "RubaXa <ibn@rubaxa.org>",
   "license": "MIT",
   "main": "webauthn.js",
+  "files": [
+    "*.js",
+    "*.js.map",
+    "*.d.ts"
+  ],
   "scripts": {
     "test": "jest --coverage",
     "start": "npm test -- --watchAll",
