@@ -147,7 +147,7 @@ credentialRequest({
   - **get**(options?: `CredentialRequestOptions`): `Promise<Credential | null>`
 - **createPhaseRequest**`<P extends object>`(): `(params: P) => Promise<R>`
 - **fetchJSON**(url: `string`, params: `object`): `Response`
-- **Decode<**
+- **Decode**
   - **decodeBuffer**(value: `string`): `ArrayBuffer`
   - **decodePublicKeyCredentialCreationOptions**(value: `object`): `PublicKeyCredentialCreationOptions`
   - **decodePublicKeyCredentialRequestOptions**(value: `object`): `PublicKeyCredentialRequestOptions`
