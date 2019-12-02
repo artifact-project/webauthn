@@ -1,0 +1,54 @@
+<html>
+<head>
+	<title>@artifact-project/webauthn</title>
+</head>
+<body>
+	<script src="./allow.dev.js"></script>
+	<script>(parent !== window) && webauthn.allowFrom([webauthn.selfOrigin]);</script>
+
+	<script>
+		var depth = (location.search.match(/depth=(\d+)/) || [])[1] | 0;
+		document.write('<h2>Depth: ' + depth + '</h2>');
+	</script>
+
+	<button id="createBtn" style="font-size: 150%; margin: 0 0 20px;">create</button>
+	<br/>
+
+	<script src="./webauthn.dev.js"></script>
+	<script>
+		if (!webauthn.isCredentialsSupported()) {
+			alert('webauthn not supproted');
+		}
+
+		webauthn.allowFor([webauthn.selfOrigin]);
+
+		createBtn.onclick = () => {
+			var options = webauthn.decodeCredentialCreationOptions({
+				publicKey: {
+					rp: {
+						name: 'Mail.ru Group'
+					},
+					user: {
+						id: 'djEuZmFzdC50ZXN0QGxpc3QucnU=',
+						name: 'v1.fast.test@list.ru',
+						displayName: 'v1.fast.test@list.ru',
+					},
+					challenge: 'gRnyAW16OQHjM66OPrYoYbpOylsXUuIdXuyP/8GMhJk=',
+					pubKeyCredParams: [{type: 'public-key', alg: -7}],
+					timeout: 30000,
+					attestation: 'none',
+				}
+			});
+
+			webauthn.credentials.create(options)
+				.then(console.log)
+				.catch(console.warn)
+			;
+		};
+
+		if (++depth < 3) {
+			document.write('<iframe src="/index.html?depth=' + depth + '" width="80%" height="70%"></iframe>');
+		}
+	</script>
+</body>
+</html>

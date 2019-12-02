@@ -142,18 +142,20 @@ credentialRequest({
 ### API
 
 - **isCredentialsSupported**(): `boolean`
-- <u>credentials</u>
-  - **create**(options?: `CredentialCreationOptions`): `Promise<CredentialType | null>`
-  - **get**(options?: `CredentialRequestOptions`): `Promise<CredentialType | null>`
+- **credentials**
+  - **create**(options?: `CredentialCreationOptions`): `Promise<Credential | null>`
+  - **get**(options?: `CredentialRequestOptions`): `Promise<Credential | null>`
 - **createPhaseRequest**`<P extends object>`(): `(params: P) => Promise<R>`
 - **fetchJSON**(url: `string`, params: `object`): `Response`
-- <u>Decode</u>
+- **Decode<**
   - **decodeBuffer**(value: `string`): `ArrayBuffer`
   - **decodePublicKeyCredentialCreationOptions**(value: `object`): `PublicKeyCredentialCreationOptions`
   - **decodePublicKeyCredentialRequestOptions**(value: `object`): `PublicKeyCredentialRequestOptions`
   - **decodeCredentialCreationOptions**(value: `object`): `CredentialCreationOptions`
   - **decodeCredentialRequestOptions**(value: `object`): `CredentialRequestOptions`
-- <u>Encode</u>
+  - **decodeAttestationResponsePayload**(credential: `object`): `PublicKeyCredentialWithAttestationResponse`
+  - **decodeAssertionResponsePlayload**(credential: `object`): `PublicKeyCredentialWithAssertionResponse`
+- **Encode**
   - **encodeBuffer**(buffer: `ArrayBuffer`): `string`
   - **encodeAttestationResponsePayload**(credential: `PublicKeyCredential`): `EncodedPublicKeyCredential`
   - **encodeAssertionResponsePlayload**(credential: `PublicKeyCredential`): `EncodedPublicKeyCredential`

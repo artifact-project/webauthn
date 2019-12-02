@@ -146,7 +146,7 @@ export function decodeTXAuthGenericArg(tx: Encode<txAuthGenericArg>): txAuthGene
 	};
 }
 
-export function decodeEncodedAuthenticationExtensions(ext: Encode<AuthenticationExtensionsClientInputs>) {
+export function decodeAuthenticationExtensions(ext: Encode<AuthenticationExtensionsClientInputs>) {
 	const result:AuthenticationExtensionsClientInputs = {
 		...ext,
 		authnSel: ext.authnSel ? ext.authnSel.map(decodeBuffer) : undefined,
@@ -162,7 +162,7 @@ export function decodePublicKeyCredentialCreationOptions(pk: Encode<PublicKeyCre
 		challenge: decodeBuffer(pk.challenge),
 		user: decodeUser(pk.user),
 		excludeCredentials: pk.excludeCredentials ? decodeCredentials(pk.excludeCredentials) : undefined,
-		extensions: pk.extensions ? decodeEncodedAuthenticationExtensions(pk.extensions) : undefined,
+		extensions: pk.extensions ? decodeAuthenticationExtensions(pk.extensions) : undefined,
 	}
 
 	return opts;
@@ -171,11 +171,9 @@ export function decodePublicKeyCredentialCreationOptions(pk: Encode<PublicKeyCre
 export function decodePublicKeyCredentialRequestOptions(pk: Encode<PublicKeyCredentialRequestOptions>): PublicKeyCredentialRequestOptions {
 	return {
 		...pk,
-		...{
-			challenge: decodeBuffer(pk.challenge),
-			allowCredentials: pk.allowCredentials ? decodeCredentials(pk.allowCredentials) : undefined,
-			extensions: pk.extensions ? decodeEncodedAuthenticationExtensions(pk.extensions) : undefined,
-		},
+		challenge: decodeBuffer(pk.challenge),
+		allowCredentials: pk.allowCredentials ? decodeCredentials(pk.allowCredentials) : undefined,
+		extensions: pk.extensions ? decodeAuthenticationExtensions(pk.extensions) : undefined,
 	};
 }
 
@@ -183,9 +181,7 @@ export function decodePublicKeyCredentialRequestOptions(pk: Encode<PublicKeyCred
 export function decodeCredentialCreationOptions(options: Encode<CredentialCreationOptions>): CredentialCreationOptions {
 	return {
 		...options,
-		...{
-			publicKey: options.publicKey ? decodePublicKeyCredentialCreationOptions(options.publicKey) : undefined,
-		},
+		publicKey: options.publicKey ? decodePublicKeyCredentialCreationOptions(options.publicKey) : undefined,
 	};
 }
 
@@ -193,8 +189,20 @@ export function decodeCredentialCreationOptions(options: Encode<CredentialCreati
 export function decodeCredentialRequestOptions(options: Encode<CredentialRequestOptions>): CredentialRequestOptions {
 	return {
 		...options,
-		...{
-			publicKey: options.publicKey ? decodePublicKeyCredentialRequestOptions(options.publicKey) : undefined,
+		publicKey: options.publicKey ? decodePublicKeyCredentialRequestOptions(options.publicKey) : undefined,
+	};
+}
+
+export function decodeAttestationResponsePayload(credential: Encode<PublicKeyCredentialWithAttestationResponse>): PublicKeyCredentialWithAttestationResponse {
+	const { response } = credential;
+
+	return {
+		...credential,
+		rawId: decodeBuffer(credential.rawId),
+		response: {
+			...response,
+			attestationObject: decodeBuffer(response.attestationObject),
+			clientDataJSON: decodeBuffer(response.clientDataJSON),
 		},
 	};
 }
@@ -204,8 +212,11 @@ export function encodeAttestationResponsePayload(credential: PublicKeyCredential
 
 	return {
 		...credential,
+		id: credential.id,
+		type: credential.type,
 		rawId: encodeBuffer(credential.rawId),
 		response: {
+			...response,
 			attestationObject: encodeBuffer(response.attestationObject),
 			clientDataJSON: encodeBuffer(response.clientDataJSON),
 		},
@@ -217,13 +228,31 @@ export function encodeAssertionResponsePlayload(credential: PublicKeyCredentialW
 
 	return {
 		...credential,
+		id: credential.id,
 		rawId: encodeBuffer(credential.rawId),
 		type: credential.type,
 		response: {
+			...response,
 			clientDataJSON: encodeBuffer(response.clientDataJSON),
 			authenticatorData: encodeBuffer(response.authenticatorData),
 			signature: encodeBuffer(response.signature),
 			userHandle: response.userHandle ? encodeBuffer(response.userHandle) : null,
+		},
+	};
+}
+
+export function decodeAssertionResponsePlayload(credential: Encode<PublicKeyCredentialWithAssertionResponse>): PublicKeyCredentialWithAssertionResponse {
+	const { response } = credential;
+
+	return {
+		...credential,
+		rawId: decodeBuffer(credential.rawId),
+		response: {
+			...response,
+			clientDataJSON: decodeBuffer(response.clientDataJSON),
+			authenticatorData: decodeBuffer(response.authenticatorData),
+			signature: decodeBuffer(response.signature),
+			userHandle: response.userHandle ? decodeBuffer(response.userHandle) : null,
 		},
 	};
 }
@@ -239,7 +268,7 @@ function concatByteToStr(str: string, byte: number) {
 function decodeObjectId<T extends {id: string}>(obj: T): T & {id: BufferSource} {
 	return {
 		...obj,
-		...{id: decodeBuffer(obj.id)},
+		id: decodeBuffer(obj.id),
 	};
 }
 

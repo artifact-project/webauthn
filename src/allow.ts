@@ -1,24 +1,16 @@
 import { log, getLogEntries, verbose } from './logger';
+import { encodeAttestationResponsePayload, encodeAssertionResponsePlayload } from './utils';
 export { getLogEntries };
 
 export const REQUEST_PID_KEY = '__webauthn:request:pid__';
 export const RESPONSE_PID_KEY = '__webauthn:response:pid__';
+export const FORWARDING_KEY = '__webauthn:forwarding:flag__';
 export const globalThis = Function('return this')() as Window;
 export const selfOrigin = globalThis.location && globalThis.location.origin || '';
 
+const FORWARDING_SOURCE = {} as {[key:string]: Window}
+
 export interface RevokeAllow { (): void; }
-
-export type CredentialsAPI = {
-	create: {
-		options: CredentialCreationOptions
-		return: Credential | null;
-	};
-
-	get: {
-		options: CredentialRequestOptions
-		return: CredentialType | null;
-	};
-}
 
 export function allowFrom(originPatterns: string[]): RevokeAllow {
 	const origins = convertOriginPatterns(originPatterns);
@@ -27,6 +19,7 @@ export function allowFrom(originPatterns: string[]): RevokeAllow {
 		function send(packed: object) {
 			const logMsg = `credentials.${data.method}(...) send response`;
 
+			packed[FORWARDING_KEY] = data[FORWARDING_KEY];
 			packed[RESPONSE_PID_KEY] = data[REQUEST_PID_KEY];
 
 			try {
@@ -37,8 +30,24 @@ export function allowFrom(originPatterns: string[]): RevokeAllow {
 			}
 		}
 
-		if (!data || !data[REQUEST_PID_KEY]) {
-			verbose('remote skipped post message data', {origin, data});
+		if (!data) {
+			// Skip empty data
+			return;
+		}
+
+		if (data[FORWARDING_KEY] && data[RESPONSE_PID_KEY]) {
+			try {
+				verbose('forwarding response from parent', {origin, data});
+				FORWARDING_SOURCE[data[RESPONSE_PID_KEY]].postMessage(data, '*');
+				delete FORWARDING_SOURCE[data[RESPONSE_PID_KEY]];
+			} catch (error) {
+				log('forwarding response from parent failed', {origin, data, error});
+			}
+			return;
+		}
+
+		if (!data[REQUEST_PID_KEY]) {
+			verbose('skip post message data, because is not invoke request', {origin, data});
 			return;
 		}
 
@@ -48,14 +57,35 @@ export function allowFrom(originPatterns: string[]): RevokeAllow {
 		}
 
 		if (data.method) {
+			const logMsg = `invoke credentials.${data.method}(...)`;
+
+			// Forwarding the event to up
+			if (parent !== globalThis) {
+				verbose(`forwarding ${logMsg}`, {origin, data});
+				data[FORWARDING_KEY] = true;
+				FORWARDING_SOURCE[data[REQUEST_PID_KEY]] = source as Window;
+				parent.postMessage(data, '*');
+				return;
+			}
+
 			try {
-				verbose(`invoke credentials.${data.method}(...)`, {origin, data});
-				globalThis.navigator.credentials[data.method](data.options)
-					.then((credential: object) => { send({response: credential}); })
-					.catch((reason: any) => { send({failed: reason}); })
+				const method = data.method;
+
+				verbose(logMsg, {origin, data});
+				globalThis.navigator.credentials[method](data.options)
+					.then((credential: any) => {
+						send({
+							response: method === 'create'
+								? encodeAttestationResponsePayload(credential)
+								: encodeAssertionResponsePlayload(credential)
+						});
+					})
+					.catch((reason: any) => {
+						send({failed: reason, data});
+					})
 				;
 			} catch (error) {
-				log(`invoke credentials.${data.method}(...) failed`, {origin, data, error});
+				log(`${logMsg} failed`, {origin, data, error});
 			}
 			return;
 		}

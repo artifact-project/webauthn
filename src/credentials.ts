@@ -7,6 +7,7 @@ import {
 	REQUEST_PID_KEY,
 	RESPONSE_PID_KEY,
 } from './allow';
+import { decodeAttestationResponsePayload, decodeAssertionResponsePlayload } from './utils';
 
 let cid = 0;
 
@@ -36,31 +37,22 @@ export const credentials = {
 		return invokeCredentials('create', options);
 	},
 
-	get(options?: CredentialRequestOptions): Promise<CredentialType | null> {
+	get(options?: CredentialRequestOptions): Promise<Credential | null> {
 		return invokeCredentials('get', options);
 	},
 };
 
 type InvokeCredentialsMethod = {
-	create: {
-		options: CredentialCreationOptions
-		return: Credential | null;
-	};
-
-	get: {
-		options: CredentialRequestOptions
-		return: CredentialType | null;
-	};
+	create: CredentialCreationOptions;
+	get: CredentialRequestOptions;
 }
 
 function invokeCredentials<
 	M extends keyof InvokeCredentialsMethod,
-	O = InvokeCredentialsMethod[M]['options'],
-	R = InvokeCredentialsMethod[M]['return'],
 >(
 	method: M,
-	options?: O,
-): Promise<R> {
+	options?: InvokeCredentialsMethod[M],
+): Promise<Credential | null> {
 	return new Promise((resolve, reject) => {
 		if (!isCredentialsSupported()) {
 			const err = new Error(`credentials.${method}(...) not supported`);
@@ -82,20 +74,23 @@ function invokeCredentials<
 				}
 
 				if ('failed' in data) {
-					verbose('response failed', {reason: data.failed, method});
+					verbose('response failed', {reason: data.failed, method, data});
 					reject(data.failed);
 					return;
 				}
 
 				if ('response' in data) {
-					verbose('response received', {response: data.response, method});
-					resolve(data.response);
+					verbose('response received', {response: data.response, method, data});
+					resolve(method === 'create'
+						? decodeAttestationResponsePayload(data.response)
+						: decodeAssertionResponsePlayload(data.response)
+					);
 					return;
 				}
 
 				log('unknown response', {method, data});
 			} catch (error) {
-				log('response processing failed', {error, method});
+				log('response processing failed', {error, method, data});
 			}
 		};
 
