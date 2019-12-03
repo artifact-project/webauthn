@@ -9,9 +9,9 @@
 	<script>
 		var depth = (location.search.match(/depth=(\d+)/) || [])[1] | 0;
 		document.write('<h2>Depth: ' + depth + '</h2>');
+		document.write('<button id="createBtn" style="font-size: '+(150 - depth*10)+'%; margin: 0 0 20px;">create</button>');
 	</script>
 
-	<button id="createBtn" style="font-size: 150%; margin: 0 0 20px;">create</button>
 	<br/>
 
 	<script src="./webauthn.dev.js"></script>
