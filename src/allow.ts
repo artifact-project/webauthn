@@ -5,6 +5,7 @@ export { getLogEntries };
 export const REQUEST_PID_KEY = '__webauthn:request:pid__';
 export const RESPONSE_PID_KEY = '__webauthn:response:pid__';
 export const FORWARDING_KEY = '__webauthn:forwarding:flag__';
+
 export const globalThis = Function('return this')() as Window;
 export const selfOrigin = globalThis.location && globalThis.location.origin || '';
 
@@ -16,8 +17,14 @@ export function allowFrom(originPatterns: string[]): RevokeAllow {
 	const origins = convertOriginPatterns(originPatterns);
 
 	function handleMessage({data, origin, source}: MessageEvent) {
-		function send(packed: object) {
-			const logMsg = `credentials.${data.method}(...) send response`;
+		if (!data) {
+			// Skip empty data
+			return;
+		}
+
+		const method = data.method;
+		const send = (packed: object) => {
+			const logMsg = `credentials.${method}(...) send response`;
 
 			packed[FORWARDING_KEY] = data[FORWARDING_KEY];
 			packed[RESPONSE_PID_KEY] = data[REQUEST_PID_KEY];
@@ -28,12 +35,7 @@ export function allowFrom(originPatterns: string[]): RevokeAllow {
 			} catch (error) {
 				log(`${logMsg} failed`, {error, packed, origin});
 			}
-		}
-
-		if (!data) {
-			// Skip empty data
-			return;
-		}
+		};
 
 		if (data[FORWARDING_KEY] && data[RESPONSE_PID_KEY]) {
 			try {
@@ -56,8 +58,8 @@ export function allowFrom(originPatterns: string[]): RevokeAllow {
 			return;
 		}
 
-		if (data.method) {
-			const logMsg = `invoke credentials.${data.method}(...)`;
+		if (method) {
+			const logMsg = `invoke credentials.${method}(...)`;
 
 			// Forwarding the event to up
 			if (parent !== globalThis) {
@@ -69,8 +71,6 @@ export function allowFrom(originPatterns: string[]): RevokeAllow {
 			}
 
 			try {
-				const method = data.method;
-
 				verbose(logMsg, {origin, data});
 				globalThis.navigator.credentials[method](data.options)
 					.then((credential: any) => {

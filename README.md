@@ -12,6 +12,7 @@ npm i --save @artifact-project/webauthn
 
 - Easy and Flexibility API 🧬
 - Supported IFrames (regardless of nesting) 💪🏻
+- Runtime logger & verbose mode ✴️
 - Fully testelably ✅
 
 ---
@@ -142,6 +143,7 @@ credentialRequest({
 ### API
 
 - **isCredentialsSupported**(): `boolean`
+- **getLogEntries**(): `Array<{msg: string; detail: object;}>`
 - **credentials**
   - **create**(options?: `CredentialCreationOptions`): `Promise<Credential | null>`
   - **get**(options?: `CredentialRequestOptions`): `Promise<Credential | null>`

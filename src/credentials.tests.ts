@@ -49,11 +49,12 @@ describe('credentials', () => {
 				configurable: true,
 				value: {
 					create(options?: CredentialCreationOptions) {
-						return Promise.resolve(options);
+						// todo: перести логику из autotest-example
+						return Promise.resolve({options, response: {attestationObject: {}}});
 					},
 
 					get(options?: CredentialRequestOptions) {
-						return Promise.resolve(options);
+						return Promise.resolve({options, response: {}});
 					},
 				},
 			});
@@ -71,13 +72,11 @@ describe('credentials', () => {
 		});
 
 		it('create', async () => {
-			expect(await credentials.create()).toBe(undefined);
-			expect(await credentials.create({foo: 'bar'} as any)).toEqual({foo: 'bar'});
+			expect((await credentials.create({foo: 'bar'} as any) as any).options).toEqual({foo: 'bar'});
 		});
 
 		it('get', async () => {
-			expect(await credentials.get()).toBe(undefined);
-			expect(await credentials.get({bar: 'qux'} as any)).toEqual({bar: 'qux'});
+			expect((await credentials.get({bar: 'qux'} as any) as any).options).toEqual({bar: 'qux'});
 		});
 	});
 });
